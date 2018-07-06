@@ -8,6 +8,6 @@
   "dependencies": {
     "discord.js": "latest",
     "dotenv": "^6.0.0",
-    "fs": "latest"
+    "fs": "0.0.1-security"
   }
 }

@@ -1,1 +1,13 @@
-{}
+{
+    "version": "0.0.1",
+    "server": {
+        "invite": "https://discord.gg/AsEpgRe",
+        "id": "431142200991154176"
+    },
+    "rebootData": {
+        "turnedOff": 1530915886767,
+        "turnedOn": 1530916106222,
+        "messageID": false,
+        "channelID": "431225966849818624"
+    }
+}
