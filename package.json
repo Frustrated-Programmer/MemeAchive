@@ -1,0 +1,13 @@
+{
+  "name": "meme-achive",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "discord.js": "latest",
+    "dotenv": "^6.0.0",
+    "fs": "latest"
+  }
+}
