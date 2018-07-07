@@ -10,6 +10,7 @@ let data = modules.data;
 client.login(process.env.token);
 process.env.token = `You cant touch this`;
 client.on(`ready`, function () {
+	modules.setMyActivity(client);
 	client.guilds.array().forEach(function (guild) {
 		if (guild.id !== data.server.id) guild.leave();
 	});
@@ -97,6 +98,11 @@ client.on(`message`, function (message) {
 		message.channel.stopTyping();
 		setTimeout(message.channel.stopTyping, 2000, true);
 
+	}
+	else if(message.content===`<@${client.user.id}>`){
+		let embed = new Discord.RichEmbed()
+			.setColor(modules.colors.purple)
+			.setTitle(`Some basic info`)
 	}
 });
 client.on(`guildMemberAdd`, function (member) {

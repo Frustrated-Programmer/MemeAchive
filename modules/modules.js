@@ -2,6 +2,7 @@ const Discord = require(`discord.js`);
 const fs = require(`fs`);
 module.exports = modules = {
 	//Data
+	activityInterval,
 	colors   : {
 		blue  : 0x0000FF,
 		purple: 0x4300C4,
@@ -187,6 +188,20 @@ module.exports = modules = {
 	saveData: function () {
 		fs.writeFile(`./data.json`, JSON.stringify(modules.data, null, 4));
 		fs.writeFile(`./usersdata.json`, JSON.stringify(modules.usersdata, null, 4));
+	},
+	setMyActivity:function (client) {
+		clearInterval(modules.activityInterval);
+		client.user.setActivity(`Sorry, I recently rebooted!`);
+		let activities = [[`playing`,`ping me 4 help`],[`playing`,`${getPrefix(false)}help`],[`playing`,`with some users`],[`watching`,`over ${client.guilds.array().length} guilds`],[`listening`,`to complaints`],[`playing`,`tic tac toe`]];
+		let previous = 100;
+		modules.activityInterval = setInterval(function () {
+			let num;
+			while(num!==previous){
+				num = Math.round(Math.random()*(activities.length-1));
+			}
+			previous = num;
+			client.user.setActivity(activities[num]);
+		},60000*5);
 	}
 }
 ;
