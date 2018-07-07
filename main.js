@@ -1,6 +1,7 @@
 //See README.md to find out whats in the .env file
 require(`dotenv`).config();
 
+//Set up
 const Discord = require(`discord.js`);
 const client = new Discord.Client();
 const commands = require(`./modules/commands`).commands;
@@ -8,21 +9,34 @@ const modules = require(`./modules/modules`);
 let data = modules.data;
 
 client.login(process.env.token);
+//Ta stop people from accessing my token
 process.env.token = `You cant touch this`;
+
+
 client.on(`ready`, function () {
+	console.log(`Bot online`);
+
+	//Sets a new activity every 5 minutes
 	modules.setMyActivity(client);
+
+	//Leaves every guild that somehow got Meme-Bot in. (besides Meme-Archive)
 	client.guilds.array().forEach(function (guild) {
 		if (guild.id !== data.server.id) guild.leave();
 	});
-	console.log(`Bot online`);
+
+	/**Reboot process**/
+	//sets time it rebooted to now.
 	data.rebootData.turnedOn = Date.now();
+	//creates an embed it will either send or edit into a message.
 	let embed = new Discord.RichEmbed()
 		.setTitle(`Restarted Bot`)
 		.setDescription(`Restarted bot.\nCurrent Version: \`${data.version}\``)
 		.setColor(0x17FF00)
 		.setFooter(`restart took ${modules.getFormattedDate(Date.now() - data.rebootData.turnedOff, true)}`);
+	//If there is a channel to send to.
 	if (data.rebootData.channelID) {
 		let channel = client.guilds.get(data.server.id).channels.get(data.rebootData.channelID);
+		//If theres a message to edit into
 		if (data.rebootData.messageID && channel) {
 			channel.fetchMessage(data.rebootData.messageID).then(function (m) {
 				m.edit({embed});
@@ -31,37 +45,56 @@ client.on(`ready`, function () {
 				channel.send({embed})
 			});
 		}
+		//Otherwise just send it to the channel.
 		else if (channel) {
 			channel.send({embed});
 		}
-		else {
-			client.fetchUser(process.env.ownerID).then(function (user) {
-				user.send({embed});
-			}).catch(console.error);
-		}
 	}
+	//Otherwise send it to the owner of the bot.
+	else {
+		client.fetchUser(process.env.ownerID).then(function (user) {
+			user.send({embed});
+		}).catch(console.error);
+	}
+
+	//Save all data in 5 seconds. (to ensure that any delay in sending the message us saved)
 	setTimeout(modules.saveData, 5000);
 });
 client.on(`message`, function (message) {
+	//If its as bot, return (bots have no business w/ my bot)
 	if (message.author.bot) return;
+
+	//If the message is in the verification channel
 	if (message.channel.id === data.server.channels.verify) {
 		message.delete();
 		if (message.content.toLowerCase() === `i agree`) {
-			message.author.send(modules.userAgreed(message));
+			//remove the unverified role from the user and send them a thank you
+			modules.userAgreed(message);
+			modules.saveData();
 		}
+		//Mute them.
 		else {
 			message.channel.send(`<@${message.author.id}> Hey that's not the \`i agree\` expected in this channel!\nMuted for \`1\` minute.\n\nIf you don't plan on agreeing to the rules then you might as well leave.`).then(function (m) {
-				message.member.addRole(message.guild.roles.find(`name`, `muted`));
+				let role = message.guild.roles.find(`name`, `muted`);
+				message.member.addRole(role);
 				setTimeout(function () {
 					m.delete();
-					setTimeout(message.member.addRole, 55000, message.guild.roles.find(`name`, `muted`));
-				}, 5000);
+					setTimeout(function () {
+						message.member.removeRole(role);
+					}, 30000);
+				}, 30000);
 			});
 		}
 		return;
 	}
+
+	//If user hasn't been verified.
 	if (!modules.usersdata[message.author.id]) return;
+
+	/**Commands**/
 	let prefix = modules.getPrefix(message);
+	let time = new Date();
+	//if it starts with the prefix
 	if (message.content.startsWith(prefix)) {
 		message.channel.startTyping();
 		let args = message.content.toLowerCase().split(` `);
@@ -74,7 +107,7 @@ client.on(`message`, function (message) {
 				message.author.send({embed});
 				return;
 			}
-			let time = new Date();
+
 			let command = commands.get(cmd);
 			if (!modules.canRunCommand(command, message, false)) return;
 			console.log(`${message.author.tag} just used: ${cmd}`);
@@ -96,18 +129,27 @@ client.on(`message`, function (message) {
 			}
 		}
 		message.channel.stopTyping();
-		setTimeout(message.channel.stopTyping, 2000, true);
-
 	}
 	else if(message.content===`<@${client.user.id}>`){
 		let embed = new Discord.RichEmbed()
 			.setColor(modules.colors.purple)
 			.setTitle(`Some basic info`)
+			.setDescription(`The prefix you can use here is \`${prefix}\`.\nRun \`${prefix}help\` for some commands`);
+		modules.setFooter(embed,message,time);
+		message.channel.send({embed});
 	}
 });
 client.on(`guildMemberAdd`, function (member) {
-	if (member.guild.id !== data.server.id) return;
+	//if it's not my guild.
+	if (member.guild.id !== data.server.id) {
+		member.guild.leave();
+		return;
+	}
+
+	//add the unverified role
 	member.addRole(member.guild.roles.find(`name`, `unverified`));
+
+	//welcome message.
 	let embed = new Discord.RichEmbed()
 		.setColor(0x00FF00)
 		.setTitle(`Welcome to Meme-Archive`)
@@ -122,4 +164,5 @@ client.on(`guildMemberRemove`, function (member) {
 process.on(`exit`, function () {
 	modules.data.rebootData.restartMsg.messageID = false;
 	modules.data.rebootData.turnedOff = Date.now();
+	modules.saveData();
 });

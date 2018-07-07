@@ -1,15 +1,15 @@
 {
-    "version": "0.0.1",
+    "version": "0.0.3",
     "server": {
         "invite": "https://discord.gg/AsEpgRe",
         "id": "431142200991154176",
-        "channels":{
-            "verify":"431172694898245652"
+        "channels": {
+            "verify": "431151094270394378"
         }
     },
     "rebootData": {
-        "turnedOff": 1530915886767,
-        "turnedOn": 1530916106222,
+        "turnedOff": 1531005220072,
+        "turnedOn": 1531005237093,
         "messageID": false,
         "channelID": "431225966849818624"
     }

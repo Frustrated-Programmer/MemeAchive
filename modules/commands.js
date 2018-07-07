@@ -8,6 +8,7 @@ commands.set(`eval`, {
 	id          : 0,
 	type        : `bot`,
 	requirements: [`owner`],
+	aliases     : [`eval`],
 	description : `Runs some code.`,
 	args        : `[code]`,
 	run         : function (message, args, time) {
@@ -17,7 +18,7 @@ commands.set(`eval`, {
 		let embed = new Discord.RichEmbed()
 			.setTitle(`Input`)
 			.setDescription(`\`\`\`nx\n${code}\`\`\``);
-			modules.setFooter(embed,message, time);
+		modules.setFooter(embed, message, time);
 
 		function clean(text) {
 			if (typeof(text) === `string`)
@@ -87,7 +88,7 @@ commandsList.push(`reboot`);
 let RMEUD = {
 	id         : 2,
 	type       : `user`,
-	aliases    : [`removeMyEndUsersData`, `RMEUD`],
+	aliases    : [`RMEUD`,`removeMyEndUsersData`],
 	description: `removes all your stored User's EndData from our bot.`,
 	run        : function (message, args) {
 		modules.removeUsersEndData(message.author);
@@ -150,13 +151,13 @@ let help = {
 						.setColor(modules.colors.orange)
 						.setTitle(`Did you mean?`)
 						.setDescription(`We couldn't find that command, yet found \`${spellChecked.length}\` items you could've meant.\n\`\`\`${items}\`\`\``);
-					modules.setFooter(embed,message, time);
+					modules.setFooter(embed, message, time);
 				}
 				else {
 					embed = new Discord.RichEmbed()
 						.setColor(modules.colors.red)
 						.setDescription(`Couldn't find the requested command.\n\nYou can use \`${prefix}help\` to get a list of commands you can check.`)
-					modules.setFooter(embed,message,time);
+					modules.setFooter(embed, message, time);
 				}
 				message.channel.send({embed});
 			}
@@ -167,15 +168,15 @@ let help = {
 			let cmd = commands.get(item);
 			if (modules.canRunCommand(cmd, message)) {
 				let start = `${prefix}${cmd.aliases[0]}`;
-				list+=`${start}${`            `.substring(start.length)}| ${cmd.type}\n`;
+				list += `${start}${`            `.substring(start.length)}| ${cmd.type}\n`;
 			}
 		});
 		let embed = new Discord.RichEmbed()
 			.setColor(modules.colors.blue)
 			.setTitle(`List of commands.`)
 			.setDescription(`\`\`\`nx\n${list}\`\`\``);
-		modules.setFooter(embed,message,time)
-			message.channel.send({embed});
+		modules.setFooter(embed, message, time)
+		message.channel.send({embed});
 	}
 };
 help.aliases.forEach(function (item) {

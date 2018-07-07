@@ -2,7 +2,7 @@ const Discord = require(`discord.js`);
 const fs = require(`fs`);
 module.exports = modules = {
 	//Data
-	activityInterval,
+	activityInterval:null,
 	colors   : {
 		blue  : 0x0000FF,
 		purple: 0x4300C4,
@@ -15,14 +15,15 @@ module.exports = modules = {
 	usersdata: require(`./../usersdata.json`),
 
 	//UsersData
-	usersAgreed       : function (message) {
+	userAgreed       : function (message) {
+		//send user a welcome message
 		modules.usersdata[message.author.id] = true;
 		let embed = new Discord.RichEmbed()
 			.setColor(modules.colors.green)
 			.setTitle(`Thank you!`)
 			.setDescription(`Thank you for accepting our rules.\nYou now have the verified role and can now view other channels!\n\nIf you wish us to remove all your [User's EndData](https://discordapp.com/developers/docs/resources/user)\ntype in the command \`${modules.getPrefix(message)}removeMyEndUsersData\` or \`${modules.getPrefix(message)}RMEUD\` for short`);
 		message.member.removeRole(message.guild.roles.find(`name`, `unverified`));
-		return embed
+		message.author.send({embed});
 	},
 	removeUsersEndData: function (user) {
 		delete modules.usersdata[user.id];
@@ -36,6 +37,7 @@ module.exports = modules = {
 		bool = bool || false;
 		milli = milli || false;
 		actualYear = actualYear || false;
+		/**time items**/
 		let mil = 1;
 		let s = mil * 1000;
 		let mi = s * 60;
@@ -49,6 +51,8 @@ module.exports = modules = {
 			names.push(`millisecond`);
 			times.push(mil)
 		}
+
+		/**formatting**/
 		let newTime = "";
 		for (let i = 0; i < times.length; i++) {
 			let amo = 0;
@@ -155,17 +159,21 @@ module.exports = modules = {
 		return matches;
 	},
 
-
 	//Commands
 	canRunCommand: function (command, message, skipSend) {
 		let reasons = [];
-		command.requirements.forEach(function (req) {
-			switch (req.toLowerCase()) {
-				case `owner`:
-					if (message.author.id !== process.env.ownerID) reasons.push(`Only the owner of the bot can use this command.`)
-					break;
-			}
-		});
+		//check all the requirements
+		if(command.requirements) {
+			command.requirements.forEach(function (req) {
+				switch (req.toLowerCase()) {
+					case `owner`:
+						if (message.author.id !== process.env.ownerID) reasons.push(`Only the owner of the bot can use this command.`)
+						break;
+				}
+			});
+		}
+
+		//if there any reasons to not allow the user.
 		if (reasons.length) {
 			let embed = new Discord.RichEmbed()
 				.setColor(modules.colors.red)
@@ -192,7 +200,7 @@ module.exports = modules = {
 	setMyActivity:function (client) {
 		clearInterval(modules.activityInterval);
 		client.user.setActivity(`Sorry, I recently rebooted!`);
-		let activities = [[`playing`,`ping me 4 help`],[`playing`,`${getPrefix(false)}help`],[`playing`,`with some users`],[`watching`,`over ${client.guilds.array().length} guilds`],[`listening`,`to complaints`],[`playing`,`tic tac toe`]];
+		let activities = [[`playing`,`ping me 4 help`],[`playing`,`${modules.getPrefix(false)}help`],[`playing`,`with some users`],[`watching`,`over ${client.guilds.array().length} guilds`],[`listening`,`to complaints`],[`playing`,`tic tac toe`]];
 		let previous = 100;
 		modules.activityInterval = setInterval(function () {
 			let num;
