@@ -10,4 +10,5 @@ I'll show you:
 ```log
 TOKEN=[insert bot's token here]
 ownerID=[insert owner of bot discord id here]
+prefix=[instert global prefix of bot here]
 ```

@@ -2,8 +2,13 @@ const Discord = require(`discord.js`);
 const modules = require(`./modules`);
 let data = modules.data;
 let commands = new Map();
+let commandsList = [];
+//Eval
 commands.set(`eval`, {
+	id:0,
 	requirements: [`owner`],
+	description:`Runs some code.`,
+	args:`[code]`,
 	run         : function (message, args, time) {
 		let code = message.content.split(` `);
 		code.shift();
@@ -35,8 +40,17 @@ commands.set(`eval`, {
 		message.channel.send({embed});
 	}
 });
+commandsList.push(`eval`);
+modules.allCommands.push(`eval`);
+
+//Reboot
 let reboot = {
+	id:1,
+	hidden:true,
 	requirements: [`owner`],
+	description:`reboots bot, can update version if argument supplied`,
+	args:`(version)`,
+	aliases:[`reboot`,`restart`,`reset`,`endprocess`],
 	run         : function (message, args, time) {
 		if (args[0]) {
 			data.version = args[0];
@@ -61,8 +75,33 @@ let reboot = {
 		})
 	}
 };
-commands.set(`reboot`, reboot);
-commands.set(`restart`, reboot);
-commands.set(`reset`, reboot);
-commands.set(`endprocess`, reboot);
+reboot.aliases.forEach(function (item) {
+	commands.set(item.toLowerCase(), reboot);
+	modules.allCommands.push(item);
+});
+commandsList.push(`reboot`);
+
+//removeMyEndUsersData
+let RMEUD = {
+	id:2,
+	aliases:[`removeMyEndUsersData`,`RMEUD`],
+	description:`removes all your stored User's EndData from our bot.`,
+	run:function (message,args) {
+		modules.removeUsersEndData(message.author);
+		message.member.addRole(message.guild.roles.find(`name`,`unverified`));
+		let embed = new Discord.RichEmbed()
+			.setColor(modules.colors.red)
+			.setTitle(`Goodbye :wave:`)
+			.setDescription(`Sorry to see you go. You can comeback at any time (here)[${data.server.invite}`);
+		message.author.send({embed});
+	}
+};
+RMEUD.aliases.forEach(function (item) {
+	commands.set(item.toLowerCase(), RMEUD);
+	modules.allCommands.push(item);
+});
+commandsList.push(`rmeud`);
+
+
+modules.commandsList = commandsList;
 exports.commands = commands;

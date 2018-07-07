@@ -6,12 +6,12 @@ const client = new Discord.Client();
 const commands = require(`./modules/commands`).commands;
 const modules = require(`./modules/modules`);
 let data = modules.data;
-let prefix = process.env.prefix || `.`;
 
 client.login(process.env.token);
+process.env.token = `You cant touch this`;
 client.on(`ready`, function () {
 	client.guilds.array().forEach(function (guild) {
-		if(guild.id !== data.server.id) guild.leave();
+		if (guild.id !== data.server.id) guild.leave();
 	});
 	console.log(`Bot online`);
 	data.rebootData.turnedOn = Date.now();
@@ -50,16 +50,17 @@ client.on(`message`, function (message) {
 		}
 		else {
 			message.channel.send(`<@${message.author.id}> Hey that's not the \`i agree\` expected in this channel!\nMuted for \`1\` minute.\n\nIf you don't plan on agreeing to the rules then you might as well leave.`).then(function (m) {
-				message.member.addRole(message.guild.roles.find(`name`,`muted`));
+				message.member.addRole(message.guild.roles.find(`name`, `muted`));
 				setTimeout(function () {
 					m.delete();
-					setTimeout(message.member.addRole,55000,message.guild.roles.find(`name`,`muted`));
+					setTimeout(message.member.addRole, 55000, message.guild.roles.find(`name`, `muted`));
 				}, 5000);
 			});
 		}
 		return;
 	}
 	if (!modules.usersdata[message.author.id]) return;
+	let prefix = modules.getPrefix(message);
 	if (message.content.startsWith(prefix)) {
 		let args = message.content.toLowerCase().split(` `);
 		let cmd = args.shift().substring(prefix.length);
@@ -73,18 +74,24 @@ client.on(`message`, function (message) {
 			}
 			let time = new Date();
 			let command = commands.get(cmd);
-			command.requirements.forEach(function (req) {
-				switch (req.toLowerCase()) {
-					case `owner`:
-						if (message.author.id !== process.env.ownerID) {
-							modules.INVALID_PERMS(message, `Only the owner of the bot can use this command.`);
-							return;
-						}
-						break;
-				}
-			});
+			if (!modules.canRunCommand(command, message, false)) return;
 			console.log(`${message.author.tag} just used: ${cmd}`);
 			command.run(message, args, time);
+		}
+		else {
+			let spellChecked = modules.spellChecker(cmd, modules.allCommands);
+			if (spellChecked.length) {
+				let items = ``;
+				spellChecked.forEach(function (item) {
+					items += ` - ${prefix}${item[0]}\n`;
+				});
+				let embed = new Discord.RichEmbed()
+					.setColor(modules.colors.orange)
+					.setTitle(`Did you mean?`)
+					.setDescription(`We couldn't find that command, yet found \`${spellChecked.length}\` items you could've meant.\n\`\`\`${items}\`\`\``)
+					.setFooter(modules.getFooter(message, time), message.author.icon_url);
+				message.channel.send({embed});
+			}
 		}
 	}
 });

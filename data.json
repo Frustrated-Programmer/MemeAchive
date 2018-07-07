@@ -2,7 +2,10 @@
     "version": "0.0.1",
     "server": {
         "invite": "https://discord.gg/AsEpgRe",
-        "id": "431142200991154176"
+        "id": "431142200991154176",
+        "channels":{
+            "verify":"431172694898245652"
+        }
     },
     "rebootData": {
         "turnedOff": 1530915886767,
