@@ -3,10 +3,12 @@ const fs = require(`fs`);
 module.exports = modules = {
 	//Data
 	colors   : {
-		blue : 0x0000FF,
-		red  : 0xFF0000,
-		orange:0xFF0000,
-		green: 0x00FF00
+		blue  : 0x0000FF,
+		purple: 0x4300C4,
+		red   : 0xFF0000,
+		yellow: 0xF0FF00,
+		orange: 0xC88600,
+		green : 0x00FF00
 	},
 	data     : require(`./../data.json`),
 	usersdata: require(`./../usersdata.json`),
@@ -68,8 +70,8 @@ module.exports = modules = {
 		}
 		return newTime;
 	},
-	getFooter       : function (message, time = new Date) {
-		return `Requested by ${message.author.tag} at ${`${time.getHours() > 12 ? time.getHours() - 12 : time.getHours() }:${time.getMinutes()} ${time.getHours() > 12 ? `PM` : `AM`}`}`;
+	setFooter       : function (embed, message, time = new Date) {
+		embed.setFooter(`Requested by ${message.author.tag} at ${`${time.getHours() > 12 ? time.getHours() - 12 : time.getHours() }:${time.getMinutes()} ${time.getHours() > 12 ? `PM` : `AM`}`}`,message.author.icon_url);
 	},
 	spellChecker    : function (check, couldBe) {
 		let mistakes;
@@ -167,8 +169,8 @@ module.exports = modules = {
 			let embed = new Discord.RichEmbed()
 				.setColor(modules.colors.red)
 				.setTitle(`Invalid Permissions`)
-				.setDescription(`You cannot use this command, Reason(s):\n\`\`\`fix\n${reasons.join(`\n`)}\`\`\`\n\n___This message will self delete in \`1\` minute__`)
-				.setFooter(modules.getFooter(message));
+				.setDescription(`You cannot use this command, Reason(s):\n\`\`\`fix\n${reasons.join(`\n`)}\`\`\`\n\n___This message will self delete in \`1\` minute__`);
+				modules.setFooter(embed,message);
 			if (!skipSend) {
 				message.channel.send({embed}).then(function (m) {
 					setTimeout(m.delete, 60000);
@@ -178,8 +180,8 @@ module.exports = modules = {
 		}
 		return true;
 	},
-	allCommands:[],//defined in ./commands.js
-	commandsList:[],//defined in ./commands.js
+	allCommands  : [],//defined in ./commands.js
+	commandsList : [],//defined in ./commands.js
 
 	//Other
 	saveData: function () {

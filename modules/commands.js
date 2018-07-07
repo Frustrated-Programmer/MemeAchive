@@ -5,18 +5,19 @@ let commands = new Map();
 let commandsList = [];
 //Eval
 commands.set(`eval`, {
-	id:0,
+	id          : 0,
+	type        : `bot`,
 	requirements: [`owner`],
-	description:`Runs some code.`,
-	args:`[code]`,
+	description : `Runs some code.`,
+	args        : `[code]`,
 	run         : function (message, args, time) {
 		let code = message.content.split(` `);
 		code.shift();
 		code = code.join(` `);
 		let embed = new Discord.RichEmbed()
 			.setTitle(`Input`)
-			.setDescription(`\`\`\`nx\n${code}\`\`\``)
-			.setFooter(modules.getFooter(message, time), message.author.icon_url);
+			.setDescription(`\`\`\`nx\n${code}\`\`\``);
+			modules.setFooter(embed,message, time);
 
 		function clean(text) {
 			if (typeof(text) === `string`)
@@ -45,12 +46,13 @@ modules.allCommands.push(`eval`);
 
 //Reboot
 let reboot = {
-	id:1,
-	hidden:true,
+	id          : 1,
+	type        : `bot`,
+	hidden      : true,
 	requirements: [`owner`],
-	description:`reboots bot, can update version if argument supplied`,
-	args:`(version)`,
-	aliases:[`reboot`,`restart`,`reset`,`endprocess`],
+	description : `reboots bot, can update version if argument supplied`,
+	args        : `(version)`,
+	aliases     : [`reboot`, `restart`, `reset`, `endprocess`],
 	run         : function (message, args, time) {
 		if (args[0]) {
 			data.version = args[0];
@@ -83,12 +85,13 @@ commandsList.push(`reboot`);
 
 //removeMyEndUsersData
 let RMEUD = {
-	id:2,
-	aliases:[`removeMyEndUsersData`,`RMEUD`],
-	description:`removes all your stored User's EndData from our bot.`,
-	run:function (message,args) {
+	id         : 2,
+	type       : `user`,
+	aliases    : [`removeMyEndUsersData`, `RMEUD`],
+	description: `removes all your stored User's EndData from our bot.`,
+	run        : function (message, args) {
 		modules.removeUsersEndData(message.author);
-		message.member.addRole(message.guild.roles.find(`name`,`unverified`));
+		message.member.addRole(message.guild.roles.find(`name`, `unverified`));
 		let embed = new Discord.RichEmbed()
 			.setColor(modules.colors.red)
 			.setTitle(`Goodbye :wave:`)

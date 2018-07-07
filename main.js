@@ -62,6 +62,7 @@ client.on(`message`, function (message) {
 	if (!modules.usersdata[message.author.id]) return;
 	let prefix = modules.getPrefix(message);
 	if (message.content.startsWith(prefix)) {
+		message.channel.startTyping();
 		let args = message.content.toLowerCase().split(` `);
 		let cmd = args.shift().substring(prefix.length);
 		if (commands.has(cmd)) {
@@ -89,10 +90,13 @@ client.on(`message`, function (message) {
 					.setColor(modules.colors.orange)
 					.setTitle(`Did you mean?`)
 					.setDescription(`We couldn't find that command, yet found \`${spellChecked.length}\` items you could've meant.\n\`\`\`${items}\`\`\``)
-					.setFooter(modules.getFooter(message, time), message.author.icon_url);
+					modules.setFooter(embed,message, time);
 				message.channel.send({embed});
 			}
 		}
+		message.channel.stopTyping();
+		setTimeout(message.channel.stopTyping, 2000, true);
+
 	}
 });
 client.on(`guildMemberAdd`, function (member) {
