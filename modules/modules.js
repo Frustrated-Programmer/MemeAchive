@@ -210,6 +210,12 @@ module.exports = modules = {
 			previous = num;
 			client.user.setActivity(activities[num]);
 		},60000*5);
+	},
+	random:function (max = 1, min = 0) {
+		let random = Math.random()*max;
+		let round = Math.round(random);
+		round += min;
+		return round;
 	}
 }
 ;

@@ -12,5 +12,13 @@
         "turnedOn": 1531005237093,
         "messageID": false,
         "channelID": "431225966849818624"
+    },
+    "roles":{
+        "ranks":[
+            "memer",
+            "teenager-quotes",
+            "troll-face",
+            "nsfw"
+        ]
     }
 }

@@ -1,3 +1,4 @@
+
 //See README.md to find out whats in the .env file
 require(`dotenv`).config();
 
@@ -49,6 +50,12 @@ client.on(`ready`, function () {
 		else if (channel) {
 			channel.send({embed});
 		}
+		else {
+			data.rebootData.channelID=false;
+			client.fetchUser(process.env.ownerID).then(function (user) {
+				user.send({embed});
+			}).catch(console.error);
+		}
 	}
 	//Otherwise send it to the owner of the bot.
 	else {
@@ -57,12 +64,18 @@ client.on(`ready`, function () {
 		}).catch(console.error);
 	}
 
-	//Save all data in 5 seconds. (to ensure that any delay in sending the message us saved)
-	setTimeout(modules.saveData, 5000);
+	//Save all data in 10 seconds. (to ensure that any delay in sending the message is saved)
+	setTimeout(modules.saveData, 10000);
 });
 client.on(`message`, function (message) {
-	//If its as bot, return (bots have no business w/ my bot)
+	//If its a bot, exit. (bots have no business w/ my bot)
 	if (message.author.bot) return;
+	let prefix = modules.getPrefix(message);
+
+	//If i need a force reboot ASAP
+	if(message.content.toLowerCase() === `${prefix}force reboot`&&message.author.id===process.env.ownerID){
+		process.exit();
+	}
 
 	//If the message is in the verification channel
 	if (message.channel.id === data.server.channels.verify) {
@@ -92,7 +105,6 @@ client.on(`message`, function (message) {
 	if (!modules.usersdata[message.author.id]) return;
 
 	/**Commands**/
-	let prefix = modules.getPrefix(message);
 	let time = new Date();
 	//if it starts with the prefix
 	if (message.content.startsWith(prefix)) {
