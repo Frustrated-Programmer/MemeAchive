@@ -19,7 +19,7 @@ client.on(`ready`, function () {
 	let logChannel = client.channels.get(data.channels.logs);
 	if(logChannel) modules.console.channel = logChannel;
 	let time = new Date();
-	console.log(`Bot online at ${`${time.getHours() > 12 ? time.getHours() - 12 : time.getHours() }:${time.getMinutes()} ${time.getHours() > 12 ? `PM` : `AM`}`}`);
+	console.log(`\n\n------------------------\nBot online at ${modules.getTime(time)}`);
 
 	//Sets a new activity every 5 minutes
 	modules.setMyActivity(client);
@@ -72,8 +72,8 @@ client.on(`ready`, function () {
 		})
 	}
 
-	//Save all data in 10 seconds. (to ensure that any delay in sending the message is saved)
-	setTimeout(modules.saveData, 10000);
+	//Save all data in 5 seconds. (to ensure that any delay in sending the message is saved)
+	setTimeout(modules.saveData, 5000);
 });
 client.on(`message`, function (message) {
 	//If its a bot, exit. (bots have no business w/ my bot)

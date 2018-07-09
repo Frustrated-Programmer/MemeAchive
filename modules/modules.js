@@ -35,6 +35,13 @@ module.exports = modules = {
 	getPrefix       : function (message) {
 		return process.env.prefix || `.`;
 	},
+	getTime:function (time) {
+		let mins = time.getMinutes();
+		let minutes = `00`;
+		minutes = minutes.substring(`${mins}`.length);
+		return `${`${time.getHours() > 12 ? time.getHours() - 12 : time.getHours() }:${minutes}${mins} ${time.getHours() > 12 ? `PM` : `AM`}`}`;
+
+	},
 	getFormattedDate: function (time, bool, milli, actualYear) {
 		bool = bool || false;
 		milli = milli || false;
@@ -78,7 +85,7 @@ module.exports = modules = {
 		return newTime;
 	},
 	setFooter       : function (embed, message, time = new Date) {
-		embed.setFooter(`Requested by ${message.author.tag} at ${`${time.getHours() > 12 ? time.getHours() - 12 : time.getHours() }:${time.getMinutes()} ${time.getHours() > 12 ? `PM` : `AM`}`}`,message.author.icon_url);
+		embed.setFooter(`Requested by ${message.author.tag} at ${modules.getTime(time)}`,message.author.icon_url);
 	},
 	spellChecker    : function (check, couldBe) {
 		let mistakes;
