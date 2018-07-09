@@ -4,6 +4,8 @@ let data = modules.data;
 let commands = new Map();
 let commandsList = [];
 let allCommands = [];
+const console = modules.console;
+
 
 
 /**
@@ -21,7 +23,7 @@ let allCommands = [];
  */
 
 //Eval
-let eval = {
+let evalC = {
 	id          : 0,
 	type        : `bot`,
 	requirements: [`owner`],
@@ -63,8 +65,8 @@ let eval = {
 		message.channel.send({embed});
 	}
 };
-eval.aliases.forEach(function (item) {
-	commands.set(item.toLowerCase(), eval);
+evalC.aliases.forEach(function (item) {
+	commands.set(item.toLowerCase(), evalC);
 	allCommands.push(item);
 });
 commandsList.push(`eval`);
@@ -290,7 +292,6 @@ ranks.aliases.forEach(function (item) {
 	allCommands.push(item);
 });
 commandsList.push(`ranks`);
-
 
 
 modules.commandsList = commandsList;

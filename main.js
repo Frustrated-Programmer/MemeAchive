@@ -1,4 +1,3 @@
-
 //See README.md to find out whats in the .env file
 require(`dotenv`).config();
 
@@ -8,6 +7,7 @@ const client = new Discord.Client();
 const commands = require(`./modules/commands`).commands;
 const modules = require(`./modules/modules`);
 let data = modules.data;
+const console = modules.console;
 
 client.login(process.env.token);
 //Ta stop people from accessing my token
@@ -15,7 +15,11 @@ process.env.token = `You cant touch this`;
 
 
 client.on(`ready`, function () {
-	console.log(`Bot online`);
+	//Set the log channel
+	let logChannel = client.channels.get(data.channels.logs);
+	if(logChannel) modules.console.channel = logChannel;
+	let time = new Date();
+	console.log(`Bot online at ${`${time.getHours() > 12 ? time.getHours() - 12 : time.getHours() }:${time.getMinutes()} ${time.getHours() > 12 ? `PM` : `AM`}`}`);
 
 	//Sets a new activity every 5 minutes
 	modules.setMyActivity(client);
@@ -51,17 +55,21 @@ client.on(`ready`, function () {
 			channel.send({embed});
 		}
 		else {
-			data.rebootData.channelID=false;
-			client.fetchUser(process.env.ownerID).then(function (user) {
-				user.send({embed});
-			}).catch(console.error);
+			data.rebootData.channelID = false;
+			process.env.owners.forEach(function (item) {
+				client.fetchUser(item).then(function (user) {
+					user.send({embed});
+				}).catch(console.error);
+			})
 		}
 	}
 	//Otherwise send it to the owner of the bot.
 	else {
-		client.fetchUser(process.env.ownerID).then(function (user) {
-			user.send({embed});
-		}).catch(console.error);
+		process.env.owners.forEach(function (item) {
+			client.fetchUser(item).then(function (user) {
+				user.send({embed});
+			}).catch(console.error);
+		})
 	}
 
 	//Save all data in 10 seconds. (to ensure that any delay in sending the message is saved)
@@ -73,12 +81,12 @@ client.on(`message`, function (message) {
 	let prefix = modules.getPrefix(message);
 
 	//If i need a force reboot ASAP
-	if(message.content.toLowerCase() === `${prefix}force reboot`&&message.author.id===process.env.ownerID){
+	if (message.content.toLowerCase() === `${prefix}force reboot` && process.env.owners.includes(message.author.id)) {
 		process.exit();
 	}
 
 	//If the message is in the verification channel
-	if (message.channel.id === data.server.channels.verify) {
+	if (message.channel.id === data.channels.verify) {
 		message.delete();
 		if (message.content.toLowerCase() === `i agree`) {
 			//remove the unverified role from the user and send them a thank you
@@ -112,7 +120,7 @@ client.on(`message`, function (message) {
 		let args = message.content.toLowerCase().split(` `);
 		let cmd = args.shift().substring(prefix.length);
 		if (commands.has(cmd)) {
-			if (message.channel.type !== "text" && message.guild.id !== data.server.id && message.author.id !== process.env.ownerID) {
+			if (message.channel.type !== "text" && message.guild.id !== data.server.id && !process.env.owners.includes(message.author.id)) {
 				let embed = new Discord.RichEmbed()
 					.addField(`Invalid Channel`, `Hello user, I currently do not support commands outside my server.\nJoin my [server](${data.server.invite}) to get access to all my commands :D`)
 					.setColor(0xce001f);
@@ -136,18 +144,18 @@ client.on(`message`, function (message) {
 					.setColor(modules.colors.orange)
 					.setTitle(`Did you mean?`)
 					.setDescription(`We couldn't find that command, yet found \`${spellChecked.length}\` items you could've meant.\n\`\`\`${items}\`\`\``)
-					modules.setFooter(embed,message, time);
+				modules.setFooter(embed, message, time);
 				message.channel.send({embed});
 			}
 		}
 		message.channel.stopTyping();
 	}
-	else if(message.content===`<@${client.user.id}>`){
+	else if (message.content === `<@${client.user.id}>`) {
 		let embed = new Discord.RichEmbed()
 			.setColor(modules.colors.purple)
 			.setTitle(`Some basic info`)
 			.setDescription(`The prefix you can use here is \`${prefix}\`.\nRun \`${prefix}help\` for some commands`);
-		modules.setFooter(embed,message,time);
+		modules.setFooter(embed, message, time);
 		message.channel.send({embed});
 	}
 });

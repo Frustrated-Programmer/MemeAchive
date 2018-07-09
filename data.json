@@ -2,19 +2,20 @@
     "version": "0.0.3",
     "server": {
         "invite": "https://discord.gg/AsEpgRe",
-        "id": "431142200991154176",
-        "channels": {
-            "verify": "431151094270394378"
-        }
+        "id": "431142200991154176"
+    },
+    "channels": {
+        "verify": "431151094270394378",
+        "logs": "431175103934365697"
     },
     "rebootData": {
         "turnedOff": 1531005220072,
-        "turnedOn": 1531005237093,
+        "turnedOn": 1531165004646,
         "messageID": false,
         "channelID": "431225966849818624"
     },
-    "roles":{
-        "ranks":[
+    "roles": {
+        "ranks": [
             "memer",
             "teenager-quotes",
             "troll-face",

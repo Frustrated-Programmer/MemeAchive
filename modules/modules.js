@@ -1,5 +1,6 @@
 const Discord = require(`discord.js`);
 const fs = require(`fs`);
+let console = require(`./console`);
 module.exports = modules = {
 	//Data
 	activityInterval:null,
@@ -13,6 +14,7 @@ module.exports = modules = {
 	},
 	data     : require(`./../data.json`),
 	usersdata: require(`./../usersdata.json`),
+
 
 	//UsersData
 	userAgreed       : function (message) {
@@ -167,7 +169,7 @@ module.exports = modules = {
 			command.requirements.forEach(function (req) {
 				switch (req.toLowerCase()) {
 					case `owner`:
-						if (message.author.id !== process.env.ownerID) reasons.push(`Only the owner of the bot can use this command.`)
+						if (!process.env.owners.includes(message.author.id)) reasons.push(`Only the owner of the bot can use this command.`)
 						break;
 				}
 			});
@@ -216,6 +218,7 @@ module.exports = modules = {
 		let round = Math.round(random);
 		round += min;
 		return round;
-	}
+	},
+	console:require(`./console`)
 }
 ;
